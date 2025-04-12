@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://d3rh2hqy60el2"
-path="res://.godot/imported/22_Post_Office_32x32.png-fe7422e6428bb659dad8513fa6d0923b.ctex"
+uid="uid://tyokkjlfnrv0"
+path="res://.godot/imported/2_City_Terrains_32x32.png-069c5d9554a3afd384147100c7019d4e.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://scene/22_Post_Office_32x32.png"
-dest_files=["res://.godot/imported/22_Post_Office_32x32.png-fe7422e6428bb659dad8513fa6d0923b.ctex"]
+source_file="res://asset/map/2_City_Terrains_32x32.png"
+dest_files=["res://.godot/imported/2_City_Terrains_32x32.png-069c5d9554a3afd384147100c7019d4e.ctex"]
 
 [params]
 
