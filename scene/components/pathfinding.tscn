@@ -1,0 +1,9 @@
+[gd_scene load_steps=2 format=3 uid="uid://fxuoej64i8qo"]
+
+[ext_resource type="Script" path="res://scripts/pathfinding.gd" id="1_ah2nf"]
+
+[node name="Pathfinding" type="Node2D" node_paths=PackedStringArray("character", "nav_agent")]
+script = ExtResource("1_ah2nf")
+character = NodePath("")
+nav_agent = NodePath("")
+SPEED = 800.0

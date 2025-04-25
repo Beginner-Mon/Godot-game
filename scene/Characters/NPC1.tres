@@ -1,0 +1,8 @@
+[gd_resource type="Resource" script_class="NPCstat" load_steps=3 format=3 uid="uid://bayvyifdq4j3u"]
+
+[ext_resource type="Script" path="res://scripts/NPCstat.gd" id="1_kktkb"]
+[ext_resource type="SpriteFrames" uid="uid://cbj5tdmkng3l4" path="res://scene/Characters/npc2.tres" id="2_kuuul"]
+
+[resource]
+script = ExtResource("1_kktkb")
+texture = ExtResource("2_kuuul")

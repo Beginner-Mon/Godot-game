@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://b24p5828l6sdm"]
+
+[ext_resource type="Script" path="res://scripts/player_animation.gd" id="1_0ijm5"]
+
+[node name="PlayerAnimation" type="Node2D"]
+script = ExtResource("1_0ijm5")

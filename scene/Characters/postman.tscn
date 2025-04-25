@@ -1,11 +1,12 @@
-[gd_scene load_steps=95 format=3 uid="uid://dljtq83qi61kj"]
+[gd_scene load_steps=97 format=3 uid="uid://dljtq83qi61kj"]
 
 [ext_resource type="Script" path="res://scripts/character.gd" id="1_f1bbp"]
 [ext_resource type="Texture2D" uid="uid://c6iydp056t7yk" path="res://asset/sprites/Modern_Exteriors_Characters_Postman_32x32_2.png" id="1_x8log"]
-[ext_resource type="Script" path="res://scene/animation_tree.gd" id="3_g4arv"]
+[ext_resource type="PackedScene" uid="uid://b24p5828l6sdm" path="res://scene/components/player_animation.tscn" id="4_m8sun"]
+[ext_resource type="PackedScene" uid="uid://fxuoej64i8qo" path="res://scene/components/pathfinding.tscn" id="5_uh7u3"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_svoe4"]
-radius = 12.0
+radius = 8.0
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_gpqc7"]
 atlas = ExtResource("1_x8log")
@@ -337,11 +338,6 @@ animations = [{
 }],
 "loop": true,
 "name": &"left_run",
-"speed": 5.0
-}, {
-"frames": [],
-"loop": true,
-"name": &"new_animation",
 "speed": 5.0
 }, {
 "frames": [{
@@ -762,7 +758,7 @@ blend_mode = 1
 [sub_resource type="AnimationNodeTimeScale" id="AnimationNodeTimeScale_eh6dt"]
 
 [sub_resource type="AnimationNodeBlendTree" id="AnimationNodeBlendTree_xjyq6"]
-graph_offset = Vector2(-3.83911, -12.826)
+graph_offset = Vector2(-68.5538, -17.876)
 nodes/BlendSpace2D/node = SubResource("AnimationNodeBlendSpace2D_8scep")
 nodes/BlendSpace2D/position = Vector2(240, 80)
 nodes/TimeScale/node = SubResource("AnimationNodeTimeScale_eh6dt")
@@ -808,8 +804,13 @@ node_connections = [&"TimeScale", 0, &"BlendSpace2D", &"output", 0, &"TimeScale"
 advance_mode = 2
 
 [sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_obv38"]
+advance_mode = 2
+advance_expression = "velocity"
 
 [sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_a5mwr"]
+advance_mode = 2
+advance_expression = "!velocity
+"
 
 [sub_resource type="AnimationNodeStateMachine" id="AnimationNodeStateMachine_g83lc"]
 states/idle/node = SubResource("AnimationNodeBlendTree_xjyq6")
@@ -819,9 +820,27 @@ states/run/position = Vector2(484, 191)
 transitions = ["Start", "idle", SubResource("AnimationNodeStateMachineTransition_2c8y5"), "idle", "run", SubResource("AnimationNodeStateMachineTransition_obv38"), "run", "idle", SubResource("AnimationNodeStateMachineTransition_a5mwr")]
 graph_offset = Vector2(-2, -6)
 
-[node name="CharacterBody2D" type="CharacterBody2D"]
+[sub_resource type="GDScript" id="GDScript_y1rw2"]
+script/source = "extends NavigationAgent2D
+
+
+# Called when the node enters the scene tree for the first time.
+func _ready() -> void:
+	pass # Replace with function body.
+
+
+# Called every frame. 'delta' is the elapsed time since the previous frame.
+func _process(delta: float) -> void:
+	pass
+"
+
+[node name="postman" type="CharacterBody2D" node_paths=PackedStringArray("player_navigation")]
 y_sort_enabled = true
+collision_layer = 2
+collision_mask = 5
+motion_mode = 1
 script = ExtResource("1_f1bbp")
+player_navigation = NodePath("NavigationAgent2D")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 position = Vector2(0, -4)
@@ -831,6 +850,7 @@ shape = SubResource("CircleShape2D_svoe4")
 position = Vector2(0, -32)
 sprite_frames = SubResource("SpriteFrames_v4fk8")
 animation = &"side_idle"
+frame = 1
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="."]
 libraries = {
@@ -839,9 +859,25 @@ libraries = {
 
 [node name="AnimationTree" type="AnimationTree" parent="."]
 tree_root = SubResource("AnimationNodeStateMachine_g83lc")
+advance_expression_base_node = NodePath("..")
 anim_player = NodePath("../AnimationPlayer")
 parameters/idle/BlendSpace2D/blend_position = Vector2(0.526012, 0.0655271)
 parameters/idle/TimeScale/scale = 0.7
 parameters/run/BlendSpace2D/blend_position = Vector2(-0.00412881, 0.0106382)
 parameters/run/TimeScale/scale = 0.7
-script = ExtResource("3_g4arv")
+
+[node name="PlayerAnimation" parent="." node_paths=PackedStringArray("animation_tree", "player") instance=ExtResource("4_m8sun")]
+animation_tree = NodePath("../AnimationTree")
+player = NodePath("..")
+
+[node name="Pathfinding" parent="." node_paths=PackedStringArray("character", "nav_agent") instance=ExtResource("5_uh7u3")]
+character = NodePath("..")
+nav_agent = NodePath("../NavigationAgent2D")
+
+[node name="NavigationAgent2D" type="NavigationAgent2D" parent="."]
+path_desired_distance = 5.0
+target_desired_distance = 5.0
+path_postprocessing = 1
+avoidance_enabled = true
+debug_enabled = true
+script = SubResource("GDScript_y1rw2")
