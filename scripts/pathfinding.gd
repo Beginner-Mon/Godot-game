@@ -2,7 +2,7 @@ extends Node2D
 
 @export var character: CharacterBody2D
 @export var nav_agent : NavigationAgent2D
-@export var SPEED: float
+@export var SPEED: float = 800
 @export var stoping_threshold : float = 10
 
 

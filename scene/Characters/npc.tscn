@@ -1,9 +1,10 @@
-[gd_scene load_steps=36 format=3 uid="uid://dht6pyos6othb"]
+[gd_scene load_steps=38 format=3 uid="uid://dht6pyos6othb"]
 
 [ext_resource type="Script" path="res://scripts/npc.gd" id="1_cfcaw"]
 [ext_resource type="SpriteFrames" uid="uid://cbj5tdmkng3l4" path="res://scene/Characters/npc2.tres" id="2_dpy56"]
 [ext_resource type="PackedScene" uid="uid://fxuoej64i8qo" path="res://scene/components/pathfinding.tscn" id="3_q3ic8"]
 [ext_resource type="PackedScene" uid="uid://b24p5828l6sdm" path="res://scene/components/player_animation.tscn" id="4_55ioc"]
+[ext_resource type="Script" path="res://scene/Characters/detect_body.gd" id="6_2v61b"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_n5s82"]
 
@@ -381,11 +382,15 @@ states/run/node = SubResource("AnimationNodeBlendTree_kj7xa")
 states/run/position = Vector2(541, 127)
 transitions = ["Start", "idle", SubResource("AnimationNodeStateMachineTransition_bby7b"), "idle", "run", SubResource("AnimationNodeStateMachineTransition_giio7"), "run", "idle", SubResource("AnimationNodeStateMachineTransition_lprma")]
 
-[node name="NPCs" type="CharacterBody2D" node_paths=PackedStringArray("navigation")]
+[sub_resource type="CircleShape2D" id="CircleShape2D_rof7l"]
+radius = 49.0102
+
+[node name="NPCs" type="CharacterBody2D" node_paths=PackedStringArray("navigation", "area")]
 collision_layer = 2
 collision_mask = 3
 script = ExtResource("1_cfcaw")
 navigation = NodePath("NavigationAgent2D")
+area = NodePath("Area2D")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 shape = SubResource("CircleShape2D_n5s82")
@@ -394,6 +399,7 @@ shape = SubResource("CircleShape2D_n5s82")
 position = Vector2(0, -32)
 sprite_frames = ExtResource("2_dpy56")
 animation = &"front_idle"
+frame = 1
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="."]
 libraries = {
@@ -418,10 +424,20 @@ path_desired_distance = 5.0
 target_desired_distance = 5.0
 path_postprocessing = 1
 avoidance_enabled = true
+radius = 0.01
 debug_enabled = true
 
 [node name="PlayerAnimation" parent="." node_paths=PackedStringArray("animation_tree", "player") instance=ExtResource("4_55ioc")]
 animation_tree = NodePath("../AnimationTree")
 player = NodePath("..")
 
+[node name="Area2D" type="Area2D" parent="."]
+collision_mask = 2
+script = ExtResource("6_2v61b")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D"]
+shape = SubResource("CircleShape2D_rof7l")
+
 [connection signal="target_reached" from="NavigationAgent2D" to="." method="_on_navigation_agent_2d_target_reached"]
+[connection signal="body_entered" from="Area2D" to="." method="_on_area_2d_body_entered"]
+[connection signal="body_exited" from="Area2D" to="." method="_on_area_2d_body_exited"]

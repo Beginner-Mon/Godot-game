@@ -1,43 +1,57 @@
 extends Node2D
 
-
-var npcScene : PackedScene = preload("res://scene/Characters/npc.tscn")
+var npcScene: PackedScene = preload("res://scene/Characters/npc.tscn")
 @onready var spawn_marker = $StartPosition
 @onready var target_marker = $TargetPosition
-signal reached_target
+@onready var timer = $Timer
+signal reached_target(node: ListNode)
+
 var line: SinglyLinkedList = SinglyLinkedList.new()
-
-
 
 var npc_stat: Array[NPCstat] = [
 	preload("res://scene/Characters/NPC1.tres")
 ]
 
 func _ready() -> void:
-	#for i in range(5):
-		#add_npc()
-	pass
+	timer.start()
+
 
 func add_npc():
 	var new_npc = npcScene.instantiate()
+	var node: ListNode
 	new_npc.stats = npc_stat[0]
 	add_child(new_npc)
-	var target_position = line.tail.position
-	var node = line.add(new_npc)
-	node.target_position = target_position
-	
-	
+	if line.tail != null:
+		var previous_obj = line.tail 
+		node = line.add(new_npc)
+
+		node.object.target_body = previous_obj.object
+
+		node.object.move_to(node.object.target_body.position) 
+	else:
+		node = line.add(new_npc)
+		node.object.move_to(target_marker.global_position) 
+	node.object.global_position = spawn_marker.global_position  
+	node.object.reached_target.connect(_on_free_line.bind(node)) 
+
 func remove_first():
 	var npc = line.remove_head()
-	
 	if npc:
 		npc.queue_free()
-	line.head.target_position = target_marker
+	if line.head != null: 
+		line.head.object.move_to(target_marker.global_position) 
 
 func remove_npc(node: ListNode):
 	var npc = line.remove_node(node)
 	if npc:
 		npc.queue_free()
 
+func _on_free_line(node: ListNode):
+	pass
 
-	
+
+func _on_timer_timeout() -> void:
+	if line.Size() >= 5:
+		timer.stop()
+	else:
+		add_npc()
